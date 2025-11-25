@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function Puzzle() {
   const [step, setStep] = useState(0);
   const [won, setWon] = useState(false);
+  const [caught, setCaught] = useState(false);
+  const [items, setItems] = useState<string[]>([]);
 
   const choices = [
     { id: 1, text: "Enter the left corridor" },
@@ -24,6 +26,27 @@ export function Puzzle() {
     }
   };
 
+  useEffect(() => {
+    // Play mysterious sound when the game starts
+    const audio = new Audio("/mysterious.mp3");
+    audio.play().catch(() => {});
+
+    // After 5 minutes, simulate the mysterious man catching the player
+    const timer = setTimeout(() => {
+      setCaught(true);
+      // Give random items
+      const possibleItems = ["Key", "Map", "Lantern", "Compass", "Coin"];
+      const randomItems = [];
+      for (let i = 0; i < 3; i++) {
+        const idx = Math.floor(Math.random() * possibleItems.length);
+        randomItems.push(possibleItems[idx]);
+      }
+      setItems(randomItems);
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="flex flex-col items-center gap-4 mt-8">
       <h2 className="text-xl font-semibold">Maze Puzzle</h2>
@@ -34,6 +57,7 @@ export function Puzzle() {
             <source src="/victory.mp3" type="audio/mpeg" />
             Your browser does not support the audio element.
           </audio>
+          <img src="/scary-face.png" alt="Scary Face" className="mt-4" />
         </div>
       ) : (
         <div className="flex flex-col gap-2">
